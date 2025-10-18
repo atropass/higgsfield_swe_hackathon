@@ -69,25 +69,9 @@ async def generate_image_to_video(
         motion_presets: Optional motion control (e.g., "objects_around:0.7")
 
     Returns:
-        Job set ID and status message
+        JSON string with job details
     """
-    print(f"\n{'='*60}")
-    print(f"IMAGE-TO-VIDEO TOOL CALLED")
-    print(f"{'='*60}")
-    print(f"Image URL: {image_url}")
-    print(f"Prompt: {prompt}")
-    print(f"Model: {model}")
-    print(f"Aspect Ratio: {aspect_ratio}")
-    print(f"Motion Presets: {motion_presets or 'None'}")
-    print(f"{'='*60}\n")
-
-    logger.info(
-        "i2v_tool_called",
-        image_url=image_url,
-        prompt=prompt,
-        aspect_ratio=aspect_ratio,
-        model=model,
-    )
+    logger.info("i2v_tool_called", prompt=prompt[:50], model=model)
 
     motions = None
     if motion_presets:
@@ -118,6 +102,5 @@ async def generate_image_to_video(
             "aspect_ratio": aspect_ratio,
             "motion_presets": motion_presets,
         },
-        "user_message": f"Animating your image with {model}. Ready in 2-4 minutes.",
     })
 

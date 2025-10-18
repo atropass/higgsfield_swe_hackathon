@@ -60,25 +60,9 @@ async def generate_text_to_video(
         resolution: Video quality - 768/1280 for minimax, 480/720 for seedance
 
     Returns:
-        Job set ID and status message
+        JSON string with job details
     """
-    print(f"\n{'='*60}")
-    print(f"TEXT-TO-VIDEO TOOL CALLED")
-    print(f"{'='*60}")
-    print(f"Prompt: {prompt}")
-    print(f"Model: {model}")
-    print(f"Aspect Ratio: {aspect_ratio}")
-    print(f"Duration: {duration}s")
-    print(f"Resolution: {resolution}")
-    print(f"{'='*60}\n")
-
-    logger.info(
-        "t2v_tool_called",
-        prompt=prompt,
-        aspect_ratio=aspect_ratio,
-        duration=duration,
-        model=model,
-    )
+    logger.info("t2v_tool_called", prompt=prompt[:50], model=model, duration=duration)
 
     if model == "minimax-hailuo-02":
         request = MinimaxT2VRequest(
@@ -109,6 +93,5 @@ async def generate_text_to_video(
             "duration": duration,
             "resolution": resolution,
         },
-        "user_message": f"Creating a {duration}-second video with {model}. Ready in 2-5 minutes.",
     })
 

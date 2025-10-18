@@ -13,7 +13,6 @@ async def health_check() -> HealthResponse:
         service="higgsfield-api",
     )
 
-
 @router.get("/", response_model=HealthResponse)
 async def root() -> HealthResponse:
     return await health_check()

@@ -15,6 +15,9 @@ class I2VService:
     ) -> JobResponse:
         request_id = str(uuid4())
 
+        if not request.input_images:
+            raise ValueError("At least one input image is required")
+
         logger.info(
             "i2v_request",
             request_id=request_id,
@@ -47,7 +50,10 @@ class I2VService:
 
         response = await i2v_client.generate_video(model, payload)
 
-        job_set_id = response.get("id") or response.get("job_set_id")
+        job_set_id = response.get("job_set_id") or response.get("id")
+        if not job_set_id:
+            logger.error("i2v_missing_job_id", request_id=request_id, response=response)
+            raise ValueError("No job_set_id returned from Higgsfield API")
 
         logger.info(
             "i2v_job_created",

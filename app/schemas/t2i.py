@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import Field, field_validator
 
 from app.schemas.common import BaseJobRequest
+from app.schemas.enums import VALID_ASPECT_RATIOS
 
 
 class T2IRequest(BaseJobRequest):
@@ -21,10 +22,9 @@ class T2IRequest(BaseJobRequest):
     @field_validator("aspect_ratio")
     @classmethod
     def validate_aspect_ratio(cls, v: str) -> str:
-        valid_ratios = ["1:1", "16:9", "9:16", "4:3", "3:4", "2:3", "3:2"]
-        if v not in valid_ratios:
-            raise ValueError(f"aspect_ratio must be one of {valid_ratios}")
-        return v
+        if v not in VALID_ASPECT_RATIOS:
+            raise ValueError(f"aspect_ratio must be one of {VALID_ASPECT_RATIOS}")
+        return v.strip()
 
 
 class NanoBananaT2IRequest(T2IRequest):

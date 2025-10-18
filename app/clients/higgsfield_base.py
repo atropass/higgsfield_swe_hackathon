@@ -64,8 +64,13 @@ class HiggsFieldBaseClient:
                     if response.status_code < 400:
                         return response.json()
 
-                    error_data = response.json()
-                    error_detail = error_data.get("message") or error_data.get("error")
+                    # Handle error response
+                    try:
+                        error_data = response.json()
+                        error_detail = error_data.get("message") or error_data.get("error") or "Unknown error"
+                    except Exception:
+                        error_data = {"raw_response": response.text}
+                        error_detail = f"HTTP {response.status_code}: {response.text[:200]}"
 
                     logger.error(
                         "higgsfield_error",
@@ -76,7 +81,7 @@ class HiggsFieldBaseClient:
                     raise UpstreamAPIError(
                         message=error_detail,
                         upstream_status=response.status_code,
-                        upstream_response=error_data if "error_data" in locals() else None,
+                        upstream_response=error_data,
                     )
 
                 except httpx.TimeoutException as e:

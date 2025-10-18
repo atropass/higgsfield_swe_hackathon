@@ -1,6 +1,7 @@
 from pydantic import Field, field_validator
 
 from app.schemas.common import BaseJobRequest
+from app.schemas.enums import VALID_VIDEO_ASPECT_RATIOS
 
 
 class T2VRequest(BaseJobRequest):
@@ -19,10 +20,9 @@ class T2VRequest(BaseJobRequest):
     @field_validator("aspect_ratio")
     @classmethod
     def validate_aspect_ratio(cls, v: str) -> str:
-        valid_ratios = ["16:9", "9:16", "1:1", "4:3", "3:4"]
-        if v not in valid_ratios:
-            raise ValueError(f"aspect_ratio must be one of {valid_ratios}")
-        return v
+        if v not in VALID_VIDEO_ASPECT_RATIOS:
+            raise ValueError(f"aspect_ratio must be one of {VALID_VIDEO_ASPECT_RATIOS}")
+        return v.strip()
 
 
 class MinimaxT2VRequest(T2VRequest):

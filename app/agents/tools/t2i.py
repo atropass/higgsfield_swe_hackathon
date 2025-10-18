@@ -47,24 +47,9 @@ async def generate_text_to_image(
         model: Which model to use (default: nano-banana)
 
     Returns:
-        Job set ID and status message
+        JSON string with job details
     """
-    print(f"\n{'='*60}")
-    print(f"TEXT-TO-IMAGE TOOL CALLED")
-    print(f"{'='*60}")
-    print(f"Prompt: {prompt}")
-    print(f"Model: {model}")
-    print(f"Aspect Ratio: {aspect_ratio}")
-    print(f"Batch Size: {batch_size}")
-    print(f"{'='*60}\n")
-
-    logger.info(
-        "t2i_tool_called",
-        prompt=prompt,
-        aspect_ratio=aspect_ratio,
-        batch_size=batch_size,
-        model=model,
-    )
+    logger.info("t2i_tool_called", prompt=prompt[:50], model=model)
 
     request = T2IRequest(
         prompt=prompt,
@@ -85,6 +70,5 @@ async def generate_text_to_image(
             "aspect_ratio": aspect_ratio,
             "batch_size": batch_size,
         },
-        "user_message": f"Perfect! Generating {batch_size} image(s) with {model}. Ready in 1-3 minutes.",
     })
 

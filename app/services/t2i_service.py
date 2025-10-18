@@ -37,7 +37,10 @@ class T2IService:
 
         response = await t2i_client.generate_image(model, payload)
 
-        job_set_id = response.get("id") or response.get("job_set_id")
+        job_set_id = response.get("job_set_id") or response.get("id")
+        if not job_set_id:
+            logger.error("t2i_missing_job_id", request_id=request_id, response=response)
+            raise ValueError("No job_set_id returned from Higgsfield API")
 
         logger.info(
             "t2i_job_created",
