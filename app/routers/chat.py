@@ -2,6 +2,7 @@ import json
 from typing import Any, Dict
 
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from app.agents import get_chat_graph
@@ -90,3 +91,82 @@ async def chat(request: ChatRequest) -> ChatResponse:
         action_performed=action_performed,
     )
 
+
+@router.post("/stream")
+async def chat_stream(request: ChatRequest) -> StreamingResponse:
+    logger.info(
+        "chat_stream_request",
+        message=request.message[:100],
+        history_length=len(request.conversation_history),
+    )
+
+    graph = await get_chat_graph()
+    messages = convert_to_langchain_messages(request.conversation_history)
+    messages.append(HumanMessage(content=request.message))
+
+    state: Dict[str, Any] = {"messages": messages}
+
+    async def event_generator():
+        yield "event: status\n" + "data: {\"status\": \"processing\"}\n\n"
+
+        accumulated_text = ""
+        latest_job_payload: Dict[str, Any] | None = None
+
+        try:
+            async for event in graph.astream_events(state, version="v2"):
+                event_type = event.get("event")
+                data = event.get("data", {})
+
+                if event_type == "on_chat_model_stream":
+                    chunk = data.get("chunk")
+                    text = None
+                    if hasattr(chunk, "content") and isinstance(chunk.content, str):
+                        text = chunk.content
+                    elif hasattr(chunk, "text") and isinstance(chunk.text, str):
+                        text = chunk.text
+                    elif isinstance(chunk, str):
+                        text = chunk
+
+                    if text:
+                        accumulated_text += text
+                        yield "event: token\n" + f"data: {{\"text\": {json.dumps(text)} }}\n\n"
+
+                elif event_type == "on_tool_end":
+                    output = data.get("output")
+                    try:
+                        parsed = json.loads(output) if isinstance(output, str) else output
+                        if isinstance(parsed, dict) and parsed.get("_higgsfield_job"):
+                            latest_job_payload = parsed
+                            job_event = {
+                                "job_set_id": parsed.get("job_set_id"),
+                                "job_type": parsed.get("job_type"),
+                                "model": parsed.get("model"),
+                                "status": parsed.get("status"),
+                                "parameters": parsed.get("parameters"),
+                                "estimated_time": "2-5 minutes",
+                            }
+                            yield "event: job\n" + f"data: {json.dumps(job_event)}\n\n"
+                    except Exception:
+                        pass
+
+            final_payload: Dict[str, Any] = {"message": accumulated_text or ""}
+
+            if latest_job_payload:
+                job_event = {
+                    "job_set_id": latest_job_payload.get("job_set_id"),
+                    "job_type": latest_job_payload.get("job_type"),
+                    "model": latest_job_payload.get("model"),
+                    "status": latest_job_payload.get("status"),
+                    "parameters": latest_job_payload.get("parameters"),
+                    "estimated_time": "2-5 minutes",
+                }
+                final_payload["job_details"] = job_event
+
+            yield "event: final\n" + f"data: {json.dumps(final_payload)}\n\n"
+            yield "event: done\n" + "data: {}\n\n"
+
+        except Exception as e:
+            err = {"message": "Sorry, an error occurred while streaming.", "detail": str(e)}
+            yield "event: error\n" + f"data: {json.dumps(err)}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
