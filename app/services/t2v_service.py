@@ -26,9 +26,10 @@ class T2VService:
             payload: Dict[str, Any] = {
                 "params": {
                     "prompt": request.prompt,
+                    "aspect_ratio": request.aspect_ratio,
                     "duration": request.duration,
                     "resolution": request.resolution,
-                    "enable_prompt_optimizier": request.enable_prompt_optimizer,
+                    "enable_prompt_optimizer": request.enable_prompt_optimizer,
                 }
             }
         else:

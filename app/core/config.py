@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     poll_interval_seconds: int = Field(default=5, alias="POLL_INTERVAL_SECONDS")
 
     cors_origins: str = Field(
-        default="http://localhost:3000,http://localhost:8000",
+        default="http://localhost:3000,http://localhost:8000,http://127.0.0.1:8000,file://,null",
         alias="CORS_ORIGINS",
     )
 

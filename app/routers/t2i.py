@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 
 from app.schemas.common import JobResponse

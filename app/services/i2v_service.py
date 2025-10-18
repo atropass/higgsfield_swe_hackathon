@@ -1,4 +1,3 @@
-
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -25,13 +24,17 @@ class I2VService:
 
         payload: Dict[str, Any] = {
             "params": {
-                "input_images": [
-                    {"type": img.type, "image_url": str(img.image_url)}
-                    for img in request.input_images
-                ],
+                "input_image": {
+                    "type": request.input_images[0].type,
+                    "image_url": str(request.input_images[0].image_url)
+                },
                 "prompt": request.prompt,
+                "aspect_ratio": request.aspect_ratio,
             }
         }
+
+        if hasattr(request, 'camera_control') and request.camera_control:
+            payload["params"]["camera_control"] = request.camera_control
 
         if request.motions:
             payload["params"]["motions"] = [

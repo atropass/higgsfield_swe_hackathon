@@ -1,0 +1,522 @@
+<!-- EXAMPLE FRONTEND FOR my vibe code frontender friend -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higgsfield AI Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            background: #f3f4f6;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .job-card {
+            margin-top: 12px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .job-type {
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #667eea;
+        }
+
+        .job-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .job-status.queued {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .job-status.processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .job-status.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .job-details {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .job-details div {
+            margin-top: 4px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .input-area {
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Higgsfield AI Chat</h1>
+            <p>Create images and videos with AI</p>
+        </div>
+
+        <div class="messages" id="messages">
+            <div class="message assistant">
+                <div class="message-content">
+                    Hi! I can help you create amazing images and videos. Just describe what you want!
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="e.g., Create a video of a cat playing piano..."
+                    onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/v1/chat';
+        const conversationHistory = [];
+        let activeJobs = new Map(); // Track active jobs for status polling
+
+        function addMessage(role, content, jobDetails = null) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            let html = `<div class="message-content">${content}`;
+
+            // Add job card if we have job details
+            if (jobDetails) {
+                const statusClass = jobDetails.status.toLowerCase();
+                html += `
+                    <div class="job-card" id="job-${jobDetails.job_set_id}">
+                        <div class="job-card-header">
+                            <span class="job-type">${jobDetails.job_type.replace(/-/g, ' ')}</span>
+                            <span class="job-status ${statusClass}">${jobDetails.status}</span>
+                        </div>
+                        <div class="job-details">
+                            <div><strong>Model:</strong> ${jobDetails.model}</div>
+                            <div><strong>Time:</strong> ${jobDetails.estimated_time}</div>
+                            ${jobDetails.parameters.prompt ? `<div><strong>Prompt:</strong> ${jobDetails.parameters.prompt}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                // Start polling for this job if it's not completed
+                if (jobDetails.status !== 'completed' && jobDetails.status !== 'failed') {
+                    activeJobs.set(jobDetails.job_set_id, jobDetails);
+                    startPolling(jobDetails.job_set_id);
+                }
+            }
+
+            html += '</div>';
+            messageDiv.innerHTML = html;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function showTyping() {
+            const messagesDiv = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message to UI
+            addMessage('user', message);
+
+            // Add to conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: message
+            });
+
+            // Clear input and disable
+            input.value = '';
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            // Show typing indicator
+            showTyping();
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversation_history: conversationHistory
+                    })
+                });
+
+                const data = await response.json();
+
+                // Hide typing
+                hideTyping();
+
+                // Add assistant message
+                addMessage('assistant', data.message, data.job_details);
+
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: data.message
+                });
+
+            } catch (error) {
+                hideTyping();
+                addMessage('assistant', `Error: ${error.message}`);
+            } finally {
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        async function checkJobStatus(jobId) {
+            try {
+                const response = await fetch(`http://localhost:8000/v1/jobs/${jobId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                // Extract job details from the API response
+                // Status is in the jobs array, not at root level
+                let jobStatus = 'unknown';
+                let resultUrl = null;
+
+                if (data.jobs && data.jobs.length > 0) {
+                    const firstJob = data.jobs[0];
+                    jobStatus = firstJob.status || 'unknown';
+
+                    // Extract result URL if completed
+                    if (jobStatus === 'completed' && firstJob.results) {
+                        if (firstJob.results.raw && firstJob.results.raw.url) {
+                            resultUrl = firstJob.results.raw.url;
+                        } else if (firstJob.results.min && firstJob.results.min.url) {
+                            resultUrl = firstJob.results.min.url;
+                        }
+                    }
+                }
+
+                const jobDetails = {
+                    job_set_id: data.id,
+                    status: jobStatus,
+                    result_url: resultUrl
+                };
+
+                // Update job card
+                updateJobCard(jobDetails);
+
+                // If completed or failed, stop polling
+                if (jobDetails.status === 'completed' || jobDetails.status === 'failed') {
+                    activeJobs.delete(jobId);
+                }
+
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        function updateJobCard(jobDetails) {
+            const jobCard = document.getElementById(`job-${jobDetails.job_set_id}`);
+            if (jobCard) {
+                const statusBadge = jobCard.querySelector('.job-status');
+                if (statusBadge) {
+                    statusBadge.className = `job-status ${jobDetails.status.toLowerCase()}`;
+                    statusBadge.textContent = jobDetails.status;
+                }
+
+                // If completed, show the result image/video
+                if (jobDetails.status === 'completed' && jobDetails.result_url) {
+                    const details = jobCard.querySelector('.job-details');
+                    if (details && !details.querySelector('.result-media')) {
+                        const mediaDiv = document.createElement('div');
+                        mediaDiv.className = 'result-media';
+                        mediaDiv.style.marginTop = '15px';
+
+                        // Check if it's a video or image
+                        const isVideo = jobDetails.result_url.includes('.mp4') || jobDetails.result_url.includes('video');
+
+                        if (isVideo) {
+                            mediaDiv.innerHTML = `
+                                <video controls style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                                    <source src="${jobDetails.result_url}" type="video/mp4">
+                                </video>
+                                <div><a href="${jobDetails.result_url}" target="_blank" style="color: #4CAF50; text-decoration: none;">⬇️ Download Video</a></div>
+                            `;
+                        } else {
+                            mediaDiv.innerHTML = `
+                                <img src="${jobDetails.result_url}" alt="Generated result" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                                <div><a href="${jobDetails.result_url}" target="_blank" style="color: #4CAF50; text-decoration: none;">⬇️ Download Image</a></div>
+                            `;
+                        }
+
+                        details.appendChild(mediaDiv);
+                    }
+                }
+            }
+        }
+
+        function startPolling(jobId) {
+            // Poll every 3 seconds
+            const interval = setInterval(() => {
+                if (!activeJobs.has(jobId)) {
+                    clearInterval(interval);
+                    return;
+                }
+                checkJobStatus(jobId);
+            }, 3000);
+        }
+
+        // Focus input on load
+        document.getElementById('userInput').focus();
+    </script>
+</body>
+
+</html>

@@ -1,14 +1,9 @@
-
-from typing import Literal, Optional
-
 from pydantic import Field, field_validator
 
 from app.schemas.common import BaseJobRequest
 
 
 class T2VRequest(BaseJobRequest):
-    """Base Text-to-Video request schema."""
-
     prompt: str = Field(
         ..., description="Text prompt for video generation", min_length=1, max_length=2000
     )

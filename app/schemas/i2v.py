@@ -6,7 +6,7 @@ from app.schemas.common import BaseJobRequest
 
 
 class InputImage(BaseModel):
-    type: Literal["url"] = Field(default="url", description="Image input type")
+    type: Literal["image_url"] = Field(default="image_url", description="Image input type")
     image_url: HttpUrl = Field(..., description="URL of the input image")
 
 

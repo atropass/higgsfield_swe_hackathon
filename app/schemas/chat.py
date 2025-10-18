@@ -1,13 +1,9 @@
-"""Chat endpoint schemas."""
-
 from typing import Any, Dict, List, Literal
 
 from pydantic import BaseModel, Field
 
 
 class ChatMessage(BaseModel):
-    """Single chat message."""
-
     role: Literal["user", "assistant", "system"] = Field(
         ..., description="Message role"
     )
@@ -15,8 +11,6 @@ class ChatMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    """Chat request."""
-
     message: str = Field(..., description="User message", min_length=1)
     conversation_history: List[ChatMessage] = Field(
         default_factory=list, description="Previous conversation history"
@@ -24,8 +18,6 @@ class ChatRequest(BaseModel):
 
 
 class JobDetails(BaseModel):
-    """Detailed job information for frontend display."""
-
     job_set_id: str = Field(..., description="Higgsfield job set ID")
     status: str = Field(..., description="Job status (queued, processing, completed, failed)")
     job_type: str = Field(..., description="Type: text-to-image, text-to-video, image-to-video")
@@ -35,8 +27,6 @@ class JobDetails(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    """Chat response with detailed job information."""
-
     message: str = Field(..., description="Assistant response message")
     job_details: JobDetails | None = Field(
         default=None, description="Detailed job information if generation was initiated"
@@ -44,4 +34,3 @@ class ChatResponse(BaseModel):
     action_performed: str | None = Field(
         default=None, description="Action performed: generate_image, generate_video, check_status, etc."
     )
-

@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
-    description="Production-grade FastAPI wrapper for Higgsfield multimodal generation APIs",
+    description="FastAPI wrapper for Higgsfield multimodal generation APIs",
     docs_url="/docs" if settings.app_debug else None,
     redoc_url="/redoc" if settings.app_debug else None,
     lifespan=lifespan,
