@@ -23,6 +23,8 @@ class Settings(BaseSettings):
         default="https://platform.higgsfield.ai", alias="HF_BASE_URL"
     )
 
+    gemini_api_key: str = Field(..., alias="GEMINI_API_KEY")
+
     request_timeout_connect: int = Field(default=10, alias="REQUEST_TIMEOUT_CONNECT")
     request_timeout_read: int = Field(default=60, alias="REQUEST_TIMEOUT_READ")
     max_retries: int = Field(default=3, alias="MAX_RETRIES")

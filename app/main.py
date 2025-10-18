@@ -13,7 +13,7 @@ from app.core.errors import (
     http_exception_handler,
 )
 from app.core.logging import get_logger, setup_logging
-from app.routers import health, i2v, jobs, t2i, t2v
+from app.routers import chat, health, i2v, jobs, t2i, t2v
 
 setup_logging()
 logger = get_logger(__name__)
@@ -89,6 +89,7 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
 app.include_router(health.router)
+app.include_router(chat.router)
 app.include_router(t2v.router)
 app.include_router(i2v.router)
 app.include_router(t2i.router)

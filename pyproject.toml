@@ -18,6 +18,9 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "structlog>=24.1.0",
     "python-multipart>=0.0.6",
+    "langgraph>=0.2.0",
+    "langchain-google-genai>=2.0.0",
+    "langchain-core>=0.3.0",
 ]
 
 [project.optional-dependencies]
