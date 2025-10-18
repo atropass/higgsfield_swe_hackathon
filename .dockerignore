@@ -4,21 +4,9 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+dist/
+build/
 
 # Virtual environments
 venv/
@@ -26,7 +14,7 @@ env/
 ENV/
 .venv
 
-# Environment variables
+# Environment and secrets
 .env
 .env.local
 
@@ -35,7 +23,6 @@ ENV/
 .idea/
 *.swp
 *.swo
-*~
 
 # Testing
 .pytest_cache/
@@ -43,17 +30,28 @@ ENV/
 htmlcov/
 .tox/
 
-# MyPy
+# Type checking and linting
 .mypy_cache/
 .dmypy.json
-dmypy.json
-
-# Ruff
 .ruff_cache/
 
-# Docker
-*.log
+# Git
+.git/
+.gitignore
 
-# OS
+# Documentation
+*.md
+!README.md
+
+# CI/CD
+.github/
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Misc
 .DS_Store
 Thumbs.db
+
